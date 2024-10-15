@@ -1,29 +1,57 @@
-import { TreiCamera } from './TreiCamera.js';
+import { TreiCamera } from '@/trei/components/cameras/TreiCamera.js';
 import { html } from 'lit';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 /**
- * TreiOrbitCamera component
- * Extends TreiCamera to provide orbit controls for camera movement
+ * @class TreiOrbitCamera
  * @extends TreiCamera
+ * @classdesc Extends TreiCamera to provide orbit controls for camera movement.
  */
 export class TreiOrbitCamera extends TreiCamera {
   static properties = {
     ...super.properties,
+    /**
+     * @property {boolean} enableDamping - Enables damping for the orbit controls.
+     */
     enableDamping: { type: Boolean },
+    /**
+     * @property {number} dampingFactor - The damping factor for the orbit controls.
+     */
     dampingFactor: { type: Number },
+    /**
+     * @property {boolean} enableZoom - Enables zoom for the orbit controls.
+     */
     enableZoom: { type: Boolean },
+    /**
+     * @property {number} minDistance - The minimum distance for the orbit controls.
+     */
     minDistance: { type: Number },
+    /**
+     * @property {number} maxDistance - The maximum distance for the orbit controls.
+     */
     maxDistance: { type: Number },
+    /**
+     * @property {boolean} enablePan - Enables panning for the orbit controls.
+     */
     enablePan: { type: Boolean },
+    /**
+     * @property {boolean} autoRotate - Enables auto-rotation for the orbit controls.
+     */
     autoRotate: { type: Boolean },
+    /**
+     * @property {number} autoRotateSpeed - The speed of auto-rotation for the orbit controls.
+     */
     autoRotateSpeed: { type: Number },
+    /**
+     * @property {boolean} debug - Enables or disables debug mode.
+     */
     debug: { type: Boolean }
   };
 
   /**
-   * @constructor
+   * Creates an instance of TreiOrbitCamera.
+   * Initializes the orbit controls properties.
    */
   constructor() {
     super();
@@ -37,10 +65,12 @@ export class TreiOrbitCamera extends TreiCamera {
     this.autoRotateSpeed = 2.0;
     this.controls = null;
     this.debug = false;
+    console.debug('TreiOrbitCamera initialized');
   }
 
   /**
-   * Lifecycle callback when the element is added to the DOM
+   * Lifecycle callback when the element is added to the DOM.
+   * Sets up the orbit controls.
    */
   connectedCallback() {
     super.connectedCallback();
@@ -49,7 +79,8 @@ export class TreiOrbitCamera extends TreiCamera {
   }
 
   /**
-   * Lifecycle callback when the element is removed from the DOM
+   * Lifecycle callback when the element is removed from the DOM.
+   * Disposes of the orbit controls.
    */
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -60,7 +91,7 @@ export class TreiOrbitCamera extends TreiCamera {
   }
 
   /**
-   * Set up the OrbitControls
+   * Sets up the OrbitControls.
    */
   setupControls() {
     const scene = this.closest('trei-scene');
@@ -74,7 +105,7 @@ export class TreiOrbitCamera extends TreiCamera {
   }
 
   /**
-   * Update the properties of the OrbitControls
+   * Updates the properties of the OrbitControls.
    */
   updateControlsProperties() {
     if (this.controls) {
@@ -100,8 +131,9 @@ export class TreiOrbitCamera extends TreiCamera {
   }
 
   /**
-   * Lifecycle callback when the element's properties change
-   * @param {Map} changedProperties
+   * Lifecycle callback when the element's properties change.
+   * Updates the orbit controls properties.
+   * @param {Map} changedProperties - The properties that changed.
    */
   updated(changedProperties) {
     super.updated(changedProperties);
@@ -112,8 +144,9 @@ export class TreiOrbitCamera extends TreiCamera {
   }
 
   /**
-   * Update method called every frame
-   * @param {number} time - The current time
+   * Update method called every frame.
+   * Updates the orbit controls.
+   * @param {number} time - The current time.
    */
   update(time) {
     if (this.controls) {
@@ -126,9 +159,9 @@ export class TreiOrbitCamera extends TreiCamera {
   }
 
   /**
-   * Log debug information if debug mode is enabled
-   * @param {string} message - The debug message
-   * @param {*} [data] - Additional data to log
+   * Logs debug information if debug mode is enabled.
+   * @param {string} message - The debug message.
+   * @param {*} [data] - Additional data to log.
    */
   logDebug(message, data) {
     if (this.debug) {
@@ -137,8 +170,8 @@ export class TreiOrbitCamera extends TreiCamera {
   }
 
   /**
-   * Render method
-   * @returns {TemplateResult}
+   * Renders the HTML template for the component.
+   * @returns {TemplateResult} The Lit HTML template.
    */
   render() {
     return html`<slot></slot>`;

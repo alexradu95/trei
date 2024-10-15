@@ -1,24 +1,40 @@
-import { TreiElement } from './base/TreiElement.js';
+import { TreiElement } from '@/trei/components/base/TreiElement.js';
 import { html } from 'lit';
 import * as THREE from 'three';
 
 /**
- * TreiLight component
- * Represents a light source in the 3D scene
+ * @class TreiLight
  * @extends TreiElement
+ * @classdesc Represents a light source in the 3D scene.
  */
 export class TreiLight extends TreiElement {
   static properties = {
     ...super.properties,
+    /**
+     * @property {string} color - The color of the light.
+     */
     color: { type: String },
+    /**
+     * @property {number} intensity - The intensity of the light.
+     */
     intensity: { type: Number },
+    /**
+     * @property {number} distance - The distance of the light.
+     */
     distance: { type: Number },
+    /**
+     * @property {number} decay - The decay rate of the light.
+     */
     decay: { type: Number },
+    /**
+     * @property {boolean} debug - Enables or disables debug mode.
+     */
     debug: { type: Boolean }
   };
 
   /**
-   * @constructor
+   * Creates an instance of TreiLight.
+   * Initializes the light properties.
    */
   constructor() {
     super();
@@ -27,10 +43,17 @@ export class TreiLight extends TreiElement {
     this.distance = 0;
     this.decay = 1;
     this.debug = false;
+    this.logDebug('TreiLight initialized with properties', {
+      color: this.color,
+      intensity: this.intensity,
+      distance: this.distance,
+      decay: this.decay
+    });
   }
 
   /**
-   * Lifecycle callback when the element is added to the DOM
+   * Lifecycle callback when the element is added to the DOM.
+   * Connects the light to the scene.
    */
   connectedCallback() {
     super.connectedCallback();
@@ -39,7 +62,7 @@ export class TreiLight extends TreiElement {
   }
 
   /**
-   * Create the Three.js light object
+   * Creates the Three.js light object.
    */
   createLight() {
     this.threeObject = new THREE.PointLight(
@@ -52,8 +75,9 @@ export class TreiLight extends TreiElement {
   }
 
   /**
-   * Lifecycle callback when the element's properties change
-   * @param {Map} changedProperties
+   * Lifecycle callback when the element's properties change.
+   * Updates the light properties accordingly.
+   * @param {Map} changedProperties - The properties that changed.
    */
   updated(changedProperties) {
     super.updated(changedProperties);
@@ -79,9 +103,9 @@ export class TreiLight extends TreiElement {
   }
 
   /**
-   * Log debug information if debug mode is enabled
-   * @param {string} message - The debug message
-   * @param {*} [data] - Additional data to log
+   * Logs debug information if debug mode is enabled.
+   * @param {string} message - The debug message.
+   * @param {*} [data] - Additional data to log.
    */
   logDebug(message, data) {
     if (this.debug) {
@@ -90,8 +114,8 @@ export class TreiLight extends TreiElement {
   }
 
   /**
-   * Render method
-   * @returns {TemplateResult}
+   * Renders the HTML template for the component.
+   * @returns {TemplateResult} The Lit HTML template.
    */
   render() {
     return html`<slot></slot>`;
