@@ -18,6 +18,7 @@ const jsdocCache = new Map();
  * @returns {Object} The parsed type object.
  */
 function parseType(typeString) {
+    console.log('Parsing type:', typeString);
     if (typeString.startsWith('Array.<') && typeString.endsWith('>')) {
         return { array: parseType(typeString.slice(7, -1)) };
     }
@@ -54,6 +55,7 @@ function parseType(typeString) {
  * @returns {*} The converted value.
  */
 function convertValue(value, type) {
+    console.log('Converting value:', value, 'to type:', type);
     const parsedType = typeof type === 'string' ? parseType(type) : type;
 
     if (typeof parsedType === 'object') {
@@ -62,7 +64,7 @@ function convertValue(value, type) {
                 try {
                     return convertValue(value, subType);
                 } catch (e) {
-                    // If conversion fails, try the next type
+                    console.error('Conversion failed for type:', subType, 'Error:', e);
                 }
             }
             throw new Error(`Cannot convert ${value} to any of ${parsedType.union.join(', ')}`);
@@ -107,6 +109,7 @@ function convertValue(value, type) {
  * @returns {Object} Parsed comment information.
  */
 function parseComment(comment) {
+    console.log('Parsing comment:', comment);
     const lines = comment.split('\n');
     const parsed = {};
     lines.forEach(line => {
@@ -125,6 +128,7 @@ function parseComment(comment) {
  * @returns {Object} Parsed JSDoc information.
  */
 function parseJSDoc(ThreeClass) {
+    console.log('Parsing JSDoc for class:', ThreeClass.name);
     if (jsdocCache.has(ThreeClass)) {
         return jsdocCache.get(ThreeClass);
     }
@@ -195,10 +199,12 @@ function parseJSDoc(ThreeClass) {
  * @returns {Class} A Lit component class.
  */
 function createThreeComponent(ThreeClass) {
+    console.log('Creating Lit component for class:', ThreeClass.name);
     const { properties, methods, events, computed, static: staticProps } = parseJSDoc(ThreeClass);
 
     return class extends LitElement {
         static get properties() {
+            console.log('Defining properties for component:', ThreeClass.name);
             return {
                 ...Object.fromEntries(
                     Object.entries(properties || {}).map(([key, value]) => [key, { type: String, attribute: true }])
@@ -211,6 +217,7 @@ function createThreeComponent(ThreeClass) {
 
         constructor() {
             super();
+            console.log('Initializing component for class:', ThreeClass.name);
             this.threeObject = new ThreeClass();
 
             // Initialize properties
@@ -253,11 +260,30 @@ function createThreeComponent(ThreeClass) {
             });
         }
 
+        connectedCallback() {
+            super.connectedCallback();
+            console.log('Component connected:', ThreeClass.name);
+        }
+
+        disconnectedCallback() {
+            super.disconnectedCallback();
+            console.log('Component disconnected:', ThreeClass.name);
+        }
+
+        firstUpdated(changedProperties) {
+            console.log('First updated for component:', ThreeClass.name, 'Changed properties:', changedProperties);
+        }
+
+        updated(changedProperties) {
+            console.log('Updated component for class:', ThreeClass.name, 'Changed properties:', changedProperties);
+        }
+
         update(changedProperties) {
+            console.log('Updating component for class:', ThreeClass.name, 'Changed properties:', changedProperties);
             super.update(changedProperties);
             if (properties) {
                 changedProperties.forEach((oldValue, propName) => {
-                    if (propName in properties) {
+                    if (properties && propName in properties) {
                         const newValue = convertValue(this[propName], properties[propName].type);
                         if (typeof newValue === 'object' && !Array.isArray(newValue)) {
                             // For object types, update nested properties
@@ -274,10 +300,12 @@ function createThreeComponent(ThreeClass) {
         }
 
         createRenderRoot() {
+            console.log('Creating render root for component:', ThreeClass.name);
             return this.attachShadow({ mode: 'open' });
         }
 
         render() {
+            console.log('Rendering component for class:', ThreeClass.name);
             return html`<slot></slot>`;
         }
     };
@@ -305,12 +333,14 @@ const ThreeClasses = [
 
 ThreeClasses.forEach(ThreeClass => {
     const componentName = `three-${ThreeClass.name.toLowerCase()}`;
+    console.log('Defining custom element:', componentName);
     customElements.define(componentName, createThreeComponent(ThreeClass));
 });
 
 // Example usage
 class ThreeApp extends LitElement {
     firstUpdated() {
+        console.log('First updated for ThreeApp');
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.shadowRoot.appendChild(this.renderer.domElement);
@@ -322,6 +352,7 @@ class ThreeApp extends LitElement {
     }
 
     animate() {
+        console.log('Animating ThreeApp');
         requestAnimationFrame(() => this.animate());
         const mesh = this.shadowRoot.querySelector('three-mesh');
         if (mesh && typeof mesh.rotateX === 'function') {
@@ -331,11 +362,23 @@ class ThreeApp extends LitElement {
         this.renderer.render(this.scene, this.camera);
     }
 
+    connectedCallback() {
+        super.connectedCallback();
+        console.log('ThreeApp connected');
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        console.log('ThreeApp disconnected');
+    }
+
     createRenderRoot() {
+        console.log('Creating render root for ThreeApp');
         return this.attachShadow({ mode: 'open' });
     }
 
     render() {
+        console.log('Rendering ThreeApp');
         return html`
             <three-scene>
                 <three-perspectivecamera position="0,0,5" fov="75" aspect="${window.innerWidth / window.innerHeight}" near="0.1" far="1000"></three-perspectivecamera>
