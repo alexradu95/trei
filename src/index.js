@@ -43,7 +43,7 @@ export class PortfolioApp extends LitElement {
     return html`
       <trei-scene>
         <trei-orbit-camera .position=${[0, 0, 5]}></trei-orbit-camera>
-        <trei-light .position=${[5, 5, 5]} color="#ffffff" intensity="1.5"></trei-light>
+        <trei-light .position=${[5, 5, 5]} color="#00ffff" intensity="4.5" .debug=${true}></trei-light>
         <trei-cube .position=${[0, 0, 0]} color="#ff0000"></trei-cube>
         <trei-sphere .position=${[2, 0, 0]} color="#00ff00"></trei-sphere>
         <trei-plane .position=${[0, -1, 0]} rotation=${[-Math.PI / 2, 0, 0]} color="#0000ff"></trei-plane>

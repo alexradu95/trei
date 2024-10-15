@@ -1,4 +1,4 @@
-import { TreiElement } from './TreiElement.js';
+import { TreiElement } from './base/TreiElement.js';
 import { html } from 'lit';
 import * as THREE from 'three';
 
