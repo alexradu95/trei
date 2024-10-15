@@ -255,20 +255,26 @@ function createThreeComponent(ThreeClass) {
 
         update(changedProperties) {
             super.update(changedProperties);
-            changedProperties.forEach((oldValue, propName) => {
-                if (propName in properties) {
-                    const newValue = convertValue(this[propName], properties[propName].type);
-                    if (typeof newValue === 'object' && !Array.isArray(newValue)) {
-                        // For object types, update nested properties
-                        Object.entries(newValue || {}).forEach(([key, value]) => {
-                            this.threeObject[propName][key] = value;
-                        });
-                    } else {
-                        this.threeObject[propName] = newValue;
+            if (properties) {
+                changedProperties.forEach((oldValue, propName) => {
+                    if (propName in properties) {
+                        const newValue = convertValue(this[propName], properties[propName].type);
+                        if (typeof newValue === 'object' && !Array.isArray(newValue)) {
+                            // For object types, update nested properties
+                            Object.entries(newValue || {}).forEach(([key, value]) => {
+                                this.threeObject[propName][key] = value;
+                            });
+                        } else {
+                            this.threeObject[propName] = newValue;
+                        }
                     }
-                }
-                // Note: Computed properties are handled by their setters
-            });
+                    // Note: Computed properties are handled by their setters
+                });
+            }
+        }
+
+        createRenderRoot() {
+            return this.attachShadow({ mode: 'open' });
         }
 
         render() {
@@ -323,6 +329,10 @@ class ThreeApp extends LitElement {
             mesh.rotateX(0.01).rotateY(0.02);
         }
         this.renderer.render(this.scene, this.camera);
+    }
+
+    createRenderRoot() {
+        return this.attachShadow({ mode: 'open' });
     }
 
     render() {
