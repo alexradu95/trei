@@ -71,8 +71,10 @@ function convertValue(value, type) {
         } else if (parsedType.object) {
             const result = {};
             const parsedValue = typeof value === 'string' ? JSON.parse(value) : value;
-            for (const [key, propType] of Object.entries(parsedType.object)) {
-                result[key] = convertValue(parsedValue[key], propType);
+            if (parsedType.object) {
+                for (const [key, propType] of Object.entries(parsedType.object || {})) {
+                    result[key] = convertValue(parsedValue[key], propType);
+                }
             }
             return result;
         } else if (parsedType.generic) {
@@ -199,10 +201,10 @@ function createThreeComponent(ThreeClass) {
         static get properties() {
             return {
                 ...Object.fromEntries(
-                    Object.entries(properties).map(([key, value]) => [key, { type: String, attribute: true }])
+                    Object.entries(properties || {}).map(([key, value]) => [key, { type: String, attribute: true }])
                 ),
                 ...Object.fromEntries(
-                    Object.entries(computed).map(([key, value]) => [key, { type: String, attribute: true }])
+                    Object.entries(computed || {}).map(([key, value]) => [key, { type: String, attribute: true }])
                 )
             };
         }
@@ -212,12 +214,12 @@ function createThreeComponent(ThreeClass) {
             this.threeObject = new ThreeClass();
 
             // Initialize properties
-            Object.keys(properties).forEach(key => {
+            Object.keys(properties || {}).forEach(key => {
                 this[key] = this.threeObject[key];
             });
 
             // Bind methods with chaining support
-            Object.keys(methods).forEach(key => {
+            Object.keys(methods || {}).forEach(key => {
                 this[key] = (...args) => {
                     const result = this.threeObject[key](...args);
                     return result === this.threeObject ? this : result;
@@ -225,14 +227,14 @@ function createThreeComponent(ThreeClass) {
             });
 
             // Set up event listeners
-            Object.keys(events).forEach(eventName => {
+            Object.keys(events || {}).forEach(eventName => {
                 this.threeObject.addEventListener(eventName, (event) => {
                     this.dispatchEvent(new CustomEvent(`three-${eventName}`, { detail: event, bubbles: true, composed: true }));
                 });
             });
 
             // Set up computed properties
-            Object.entries(computed).forEach(([key, { get, set, type }]) => {
+            Object.entries(computed || {}).forEach(([key, { get, set, type }]) => {
                 Object.defineProperty(this, key, {
                     get: get ? () => this.threeObject[key] : undefined,
                     set: set ? (value) => {
@@ -246,7 +248,7 @@ function createThreeComponent(ThreeClass) {
             });
 
             // Set up static properties
-            Object.entries(staticProps).forEach(([key, { value }]) => {
+            Object.entries(staticProps || {}).forEach(([key, { value }]) => {
                 this.constructor[key] = value;
             });
         }
@@ -258,7 +260,7 @@ function createThreeComponent(ThreeClass) {
                     const newValue = convertValue(this[propName], properties[propName].type);
                     if (typeof newValue === 'object' && !Array.isArray(newValue)) {
                         // For object types, update nested properties
-                        Object.entries(newValue).forEach(([key, value]) => {
+                        Object.entries(newValue || {}).forEach(([key, value]) => {
                             this.threeObject[propName][key] = value;
                         });
                     } else {
@@ -316,8 +318,10 @@ class ThreeApp extends LitElement {
     animate() {
         requestAnimationFrame(() => this.animate());
         const mesh = this.shadowRoot.querySelector('three-mesh');
-        // Example of method chaining
-        mesh.rotateX(0.01).rotateY(0.02);
+        if (mesh && typeof mesh.rotateX === 'function') {
+            // Example of method chaining
+            mesh.rotateX(0.01).rotateY(0.02);
+        }
         this.renderer.render(this.scene, this.camera);
     }
 
